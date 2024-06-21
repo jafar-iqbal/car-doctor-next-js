@@ -1,35 +1,15 @@
 "use client";
+import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useState } from "react";
 import { IoCartOutline, IoSearchSharp } from "react-icons/io5";
 
 const Navbar = () => {
+  const session = useSession();
+  console.log(session);
+
   const [isOpen, setIsOpen] = useState(false);
-
-  const navItems = [
-    {
-      title: "Home",
-      path: "/",
-    },
-    {
-      title: "About",
-      path: "/about",
-    },
-    {
-      title: "Services",
-      path: "/services",
-    },
-    {
-      title: "Blog",
-      path: "/blog",
-    },
-    {
-      title: "Contact",
-      path: "/contact",
-    },
-  ];
-
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
   };
@@ -94,15 +74,49 @@ const Navbar = () => {
           </ul>
         </div>
         <div className="navbar-end">
-                  <div className="flex space-x-3 items-center">
-                  <IoCartOutline className="text-2xl"/>
-          <IoSearchSharp className="text-2xl"/>
-          <a className="btn btn-outline btn-primary px-8">Appointment</a>
+          <div className="flex space-x-3 items-center">
+            <IoCartOutline className="text-2xl" />
+            <IoSearchSharp className="text-2xl" />
+            <a className="btn btn-outline btn-primary px-8">Appointment</a>
+            <div>
+              <Image alt={ session?.data?.user?.name} src={session?.data?.user?.image} height={50} width={50} className="rounded-full"/>
+            </div>
+            {session?.status === "Loading" &&
+              <h6>Loading...</h6>
+            }
+            {session?.status === "unauthenticated" &&
+              <button className="btn btn-primary">
+                <Link href="/login">Login</Link>
+              </button>}
+            {session?.status === "authenticated" &&
+              <button onClick={()=>signOut()} className="btn btn-primary">Logout</button>
+            }
           </div>
         </div>
       </div>
     </div>
   );
 };
-
+const navItems = [
+  {
+    title: "Home",
+    path: "/",
+  },
+  {
+    title: "About",
+    path: "/about",
+  },
+  {
+    title: "Services",
+    path: "/services",
+  },
+  {
+    title: "Blog",
+    path: "/blog",
+  },
+  {
+    title: "Contact",
+    path: "/contact",
+  },
+];
 export default Navbar;
