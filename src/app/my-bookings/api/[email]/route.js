@@ -2,10 +2,10 @@ import { connectDB } from "@/lib/connect.DB";
 
 export const GET = async (req, { params }) => {
   const db = await connectDB();
-  const servicesCollection = db.collection("services");
+  const bookingsCollection = db.collection("bookings");
   try {
-    const service = await servicesCollection.findOne({ _id: params.id });
-    return Response.json({ service });
+    const myBookings = await bookingsCollection.find({ email: params.email }).toArray();
+    return Response.json({ myBookings });
   } catch (error) {
     console.log(error.message);
   }
