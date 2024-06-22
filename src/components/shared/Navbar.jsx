@@ -1,4 +1,5 @@
 "use client";
+
 import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
@@ -7,8 +8,6 @@ import { IoCartOutline, IoSearchSharp } from "react-icons/io5";
 
 const Navbar = () => {
   const session = useSession();
-  console.log(session);
-
   const [isOpen, setIsOpen] = useState(false);
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
@@ -79,24 +78,36 @@ const Navbar = () => {
             <IoSearchSharp className="text-2xl" />
             <a className="btn btn-outline btn-primary px-8">Appointment</a>
             <div>
-              <Image alt={ session?.data?.user?.name} src={session?.data?.user?.image} height={50} width={50} className="rounded-full"/>
+              {session?.data?.user?.image ? (
+                <Image
+                  alt={session?.data?.user?.name || "User image"}
+                  src={session?.data?.user?.image}
+                  height={50}
+                  width={50}
+                  className="rounded-full border-2"
+                />
+              ) : (
+                <div className="w-12 h-12 bg-gray-200 rounded-full" />
+              )}
             </div>
-            {session?.status === "Loading" &&
-              <h6>Loading...</h6>
-            }
-            {session?.status === "unauthenticated" &&
-              <button className="btn btn-primary">
-                <Link href="/login">Login</Link>
-              </button>}
-            {session?.status === "authenticated" &&
-              <button onClick={()=>signOut()} className="btn btn-primary">Logout</button>
-            }
+            {session?.status === "loading" && <h6>Loading...</h6>}
+            {session?.status === "unauthenticated" && (
+              <Link href="/login">
+                <button className="btn btn-primary">Login</button>
+              </Link>
+            )}
+            {session?.status === "authenticated" && (
+              <button onClick={() => signOut()} className="btn btn-primary">
+                Logout
+              </button>
+            )}
           </div>
         </div>
       </div>
     </div>
   );
 };
+
 const navItems = [
   {
     title: "Home",
@@ -119,4 +130,5 @@ const navItems = [
     path: "/contact",
   },
 ];
+
 export default Navbar;

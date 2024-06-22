@@ -1,34 +1,42 @@
 "use client";
+import SocialSignin from "@/components/shared/SocialSignin";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useState } from "react";
-import { BiLogoFacebookCircle } from "react-icons/bi";
-import { FcGoogle } from "react-icons/fc";
-import { ImGithub } from "react-icons/im";
 
 const SignUpPage = () => {
   const [selectedImage, setSelectedImage] = useState(null);
+  const [error, setError] = useState(null);
 
   const handleSignUp = async (event) => {
     event.preventDefault();
+    setError(null);
+
     const newUser = {
       name: event.target.name.value,
       email: event.target.email.value,
       password: event.target.password.value,
-      image: selectedImage, // Include the selected image
+      image: selectedImage,
     };
 
-    const res = await fetch("http://localhost:3000/signup/api", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(newUser),
-    });
+    try {
+      const res = await fetch("http://localhost:3000/signup/api", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newUser),
+      });
 
-    if (res.status === 200) {
-      event.target.reset();
-      setSelectedImage(null); // Reset the selected image
+      if (res.status === 200) {
+        event.target.reset();
+        setSelectedImage(null); 
+      } else {
+        const data = await res.json();
+        setError(data.message || 'Something went wrong');
+      }
+    } catch (err) {
+      setError('Something went wrong');
     }
   };
 
@@ -59,7 +67,7 @@ const SignUpPage = () => {
             Please Sign Up
           </h6>
           <form onSubmit={handleSignUp}>
-            <label htmlFor="name" id="user">User Name</label>
+            <label htmlFor="name">User Name</label>
             <label className="input input-bordered flex items-center gap-2 mb-6">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -69,9 +77,9 @@ const SignUpPage = () => {
               >
                 <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM12.735 14c.618 0 1.093-.561.872-1.139a6.002 6.002 0 0 0-11.215 0c-.22.578.254 1.139.872 1.139h9.47Z" />
               </svg>
-              <input type="text" className="grow" name="name" placeholder="Username" />
+              <input type="text" className="grow" name="name" placeholder="Username" required />
             </label>
-            <label htmlFor="email" id="email">Email</label>
+            <label htmlFor="email">Email</label>
             <label className="input input-bordered flex items-center gap-2 mb-6">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -82,9 +90,9 @@ const SignUpPage = () => {
                 <path d="M2.5 3A1.5 1.5 0 0 0 1 4.5v.793c.026.009.051.02.076.032L7.674 8.51c.206.1.446.1.652 0l6.598-3.185A.755.755 0 0 1 15 5.293V4.5A1.5 1.5 0 0 0 13.5 3h-11Z" />
                 <path d="M15 6.954 8.978 9.86a2.25 2.25 0 0 1-1.956 0L1 6.954V11.5A1.5 1.5 0 0 0 2.5 13h11a1.5 1.5 0 0 0 1.5-1.5V6.954Z" />
               </svg>
-              <input type="text" name="email" className="grow" placeholder="Email" />
+              <input type="email" name="email" className="grow" placeholder="Email" required />
             </label>
-            <label htmlFor="password" id="password">Password</label>
+            <label htmlFor="password">Password</label>
             <label className="input input-bordered flex items-center gap-2 mb-6">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -97,10 +105,10 @@ const SignUpPage = () => {
                   clipRule="evenodd"
                 />
               </svg>
-              <input type="password" name="password" className="grow" placeholder="Enter password" />
+              <input type="password" name="password" className="grow" placeholder="Enter password" required />
             </label>
 
-            <label htmlFor="image" id="image" >Profile Image</label>
+            <label htmlFor="image">Profile Image</label>
             <input type="file" name="image" accept="image/*" onChange={handleImageChange} className="mb-6" />
 
             {selectedImage && (
@@ -115,29 +123,25 @@ const SignUpPage = () => {
               </div>
             )}
 
+            {error && (
+              <div className="mb-6 text-red-500">
+                {error}
+              </div>
+            )}
+
             <button type="submit" className="btn btn-primary w-full text-base">
               Sign Up
             </button>
           </form>
           <div className="mt-12">
             <h6 className="divider text-cyan-700">or sign in with</h6>
-            <div className="text-center space-x-3">
-              <button className="btn bg-slate-300 text-3xl">
-                <FcGoogle />
-              </button>
-              <button className="btn bg-slate-300 text-3xl">
-                <ImGithub />
-              </button>
-              <button className="btn bg-slate-300 text-3xl">
-                <BiLogoFacebookCircle />
-              </button>
-              <h6 className="text-cyan-700 mt-12">
-                Already Have an account?{" "}
-                <Link href="/login" className="text-primary font-semibold">
-                  Sign In
-                </Link>
-              </h6>
-            </div>
+            <SocialSignin/>
+            <h6 className="text-cyan-700 mt-12">
+              Already Have an account?{" "}
+              <Link href="/login" className="text-primary font-semibold">
+                Sign In
+              </Link>
+            </h6>
           </div>
         </div>
       </div>

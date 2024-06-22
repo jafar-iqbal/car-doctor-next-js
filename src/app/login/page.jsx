@@ -2,17 +2,14 @@
 
 import Image from "next/image";
 import React from "react";
-import { ImGithub } from "react-icons/im";
-import { FcGoogle } from "react-icons/fc";
-import { BiLogoFacebookCircle } from "react-icons/bi";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-
+import SocialSignin from "@/components/shared/SocialSignin";
 
 const Page = () => {
+  const router = useRouter();
 
-const router = useRouter()
   const handleLogin = async (event) => {
     event.preventDefault();
     const email = event.target.email.value;
@@ -24,10 +21,11 @@ const router = useRouter()
       redirect: false,
     });
 
-    if (res.status === 200) {
-       router.push('/')
-     }
-
+    if (res?.ok) {
+      router.push('/');
+    } else {
+      console.error("Login failed", res);
+    }
   };
 
   return (
@@ -98,17 +96,9 @@ const router = useRouter()
           <div className="mt-12">
             <h6 className="divider text-cyan-700">or sign in with</h6>
             <div className="text-center space-x-3">
-              <button className="btn bg-slate-300 text-3xl">
-                <FcGoogle />
-              </button>
-              <button className="btn bg-slate-300 text-3xl">
-                <ImGithub />
-              </button>
-              <button className="btn bg-slate-300 text-3xl">
-                <BiLogoFacebookCircle />
-              </button>
+              <SocialSignin/>
               <h6 className="text-cyan-700 mt-12">
-                Don't have an account?{" "}
+                Do not have an account?{" "}
                 <Link href="/signup" className="text-primary font-semibold">
                   Sign Up
                 </Link>

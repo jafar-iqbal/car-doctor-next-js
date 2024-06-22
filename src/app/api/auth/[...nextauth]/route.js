@@ -25,14 +25,12 @@ const handler = NextAuth({
         }
 
         const db = await connectDB();
-        const currentUser = await db
-          .collection("users1")
-          .findOne({ email: email });
+        const currentUser = await db.collection("users1").findOne({ email: email.toLowerCase() });
         if (!currentUser) {
           throw new Error("No user found with the given email");
         }
 
-        const passMatched = bcrypt.compareSync(password, currentUser.password);
+        const passMatched = await bcrypt.compare(password, currentUser.password);
         if (!passMatched) {
           throw new Error("Incorrect password");
         }
@@ -58,12 +56,10 @@ const handler = NextAuth({
       const db = await connectDB();
 
       if (user) {
-        const existingUser = await db
-          .collection("users1")
-          .findOne({ email: user.email });
+        const existingUser = await db.collection("users1").findOne({ email: user.email.toLowerCase() });
         if (!existingUser) {
           const newUser = {
-            email: user.email,
+            email: user.email.toLowerCase(),
             name: user.name || "",
             image: user.image || "",
           };
@@ -72,11 +68,9 @@ const handler = NextAuth({
         } else {
           token.id = existingUser._id;
         }
-        token.email = user.email;
-      } else {
-        const dbUser = await db
-          .collection("users1")
-          .findOne({ _id: new ObjectId(token.id) });
+        token.email = user.email.toLowerCase();
+      } else if (token.id) {
+        const dbUser = await db.collection("users1").findOne({ _id: new ObjectId(token.id) });
         if (dbUser) {
           token.email = dbUser.email;
         }
