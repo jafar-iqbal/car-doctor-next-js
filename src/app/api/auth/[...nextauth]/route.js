@@ -5,7 +5,6 @@ import bcrypt from "bcrypt";
 import FacebookProvider from "next-auth/providers/facebook";
 import GitHubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
-import { ObjectId } from "mongodb";
 
 const handler = NextAuth({
   session: {
@@ -52,43 +51,31 @@ const handler = NextAuth({
     }),
   ],
   callbacks: {
-    async jwt({ token, user, account }) {
-      const db = await connectDB();
-
-      if (user) {
-        const existingUser = await db.collection("users1").findOne({ email: user.email.toLowerCase() });
-        if (!existingUser) {
-          const newUser = {
-            email: user.email.toLowerCase(),
-            name: user.name || "",
-            image: user.image || "",
-          };
-          const result = await db.collection("users1").insertOne(newUser);
-          token.id = result.insertedId;
-        } else {
-          token.id = existingUser._id;
+    async signIn({ user, account }) {
+      if (account.provider === "google" || account.provider === "github" || account.provider === "facebook") {
+        const {email,} = user;
+        try {
+          const db = await connectDB();
+          const userCollection = db.collection("users");
+          const userExist = await userCollection.findOne({ email });
+          if (!userExist) {
+            const res = await userCollection.insertOne(user);
+            return user;
+          } else {
+            return user;
+          }
+        } catch (error) {
+          console.log(error);
         }
-        token.email = user.email.toLowerCase();
-      } else if (token.id) {
-        const dbUser = await db.collection("users1").findOne({ _id: new ObjectId(token.id) });
-        if (dbUser) {
-          token.email = dbUser.email;
-        }
+      } else {
+        return user;
       }
-
-      return token;
-    },
-    async session({ session, token }) {
-      if (token) {
-        session.user.id = token.id;
-        session.user.email = token.email;
-      }
-      return session;
     },
   },
   pages: {
     signIn: "/login",
   },
+
 });
 
 export { handler as GET, handler as POST };

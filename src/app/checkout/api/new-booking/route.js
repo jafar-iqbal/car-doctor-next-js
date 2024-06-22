@@ -1,13 +1,13 @@
 import { connectDB } from "@/lib/connect.DB";
 
 export const POST = async (req) => {
-  const booking = await req.json();
+  const newBooking = await req.json();
   const db = await connectDB();
   const bookingsCollection = db.collection("bookings");
   try {
-    const newBooking = await bookingsCollection.insertOne(booking);
-    return Response.json({ message: "booking successfully" });
+    const res = await bookingsCollection.insertOne(newBooking);
+    return Response.json({ message: "Booked Successfully" }, { status: 200 });
   } catch (error) {
-    console.log(error.message);
+    return Response.json({ message: "Something Went Wrong" }, { status: 400 });
   }
 };
