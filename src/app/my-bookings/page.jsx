@@ -14,7 +14,7 @@ const Page = () => {
     if (status === "authenticated" && session?.user?.email) {
       try {
         const res = await fetch(
-          `http://localhost:3000/my-bookings/api/${session.user.email}`
+          `${process.env.NEXT_PUBLIC_BASE_URL}/my-bookings/api/${session.user.email}`
         );
         const data = await res.json();
         setBookings(data.myBookings);
@@ -29,7 +29,7 @@ const Page = () => {
   const handleDelete = async (id) => {
     try {
       const deleted = await fetch(
-        `http://localhost:3000/my-bookings/api/booking/${id}`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/my-bookings/api/booking/${id}`,
         {
           method: "DELETE",
         }

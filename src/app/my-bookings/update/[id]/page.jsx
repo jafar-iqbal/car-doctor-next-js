@@ -12,7 +12,7 @@ const Page = ({ params }) => {
   const loadBooking = async () => {
     try {
       const bookingDetail = await fetch(
-        `http://localhost:3000/my-bookings/api/booking/${params.id}`
+        `${process.env.NEXT_PUBLIC_BASE_URL}/my-bookings/api/booking/${params.id}`
       );
       if (!bookingDetail.ok) throw new Error("Failed to fetch booking details");
       const data = await bookingDetail.json();
@@ -32,7 +32,7 @@ const Page = ({ params }) => {
 
     try {
       const res = await fetch(
-        `http://localhost:3000/my-bookings/api/booking/${params.id}`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/my-bookings/api/booking/${params.id}`,
         {
           method: "PATCH",
           body: JSON.stringify(updatedBooking),
