@@ -1,3 +1,4 @@
+"use client"
 import SocialSignin from "@/components/shared/SocialSignin";
 import { signIn, useSession } from "next-auth/react";
 import Image from "next/image";
