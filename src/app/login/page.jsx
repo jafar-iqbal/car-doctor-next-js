@@ -1,17 +1,15 @@
-"use client";
-
 import SocialSignin from "@/components/shared/SocialSignin";
-import { signIn, useSession,} from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-
+import { useRouter } from "next/router";
+import { Suspense } from 'react';
 
 const Page = () => {
   const router = useRouter();
   const session = useSession();
-  const searchParams = useSearchParams();
-  const path = searchParams.get("redirect");
+  const searchParams = typeof window !== 'undefined' ? useRouter().query : null;
+  const path = searchParams ? searchParams.redirect : null;
 
   const handleLogin = async (event) => {
     event.preventDefault();

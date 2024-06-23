@@ -1,10 +1,12 @@
-"use client";
 import SocialSignin from "@/components/shared/SocialSignin";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from 'next/router';
+import { Suspense } from 'react';
 
 const SignUpPage = () => {
+  const router = useRouter();
   const [error, setError] = useState(null);
 
   const handleSignUp = async (event) => {
@@ -14,8 +16,9 @@ const SignUpPage = () => {
       name: event.target.name.value,
       email: event.target.email.value,
       password: event.target.password.value,
-
     };
+
+    try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/signup/api`, {
         method: "POST",
         body: JSON.stringify(newUser),
@@ -23,10 +26,17 @@ const SignUpPage = () => {
           "content-type": "application/json",
         },
       });
+
       if (res.status === 200) {
         event.target.reset();
+        router.push('/login'); // Redirect after successful signup
+      } else {
+        throw new Error('Signup failed');
       }
+    } catch (error) {
+      setError('Failed to sign up. Please try again.');
     }
+  };
 
   return (
     <div className="container mx-auto py-24 px-4 md:px-24">
