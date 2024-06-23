@@ -1,14 +1,15 @@
 "use client";
 
-import Image from "next/image";
-import React from "react";
-import Link from "next/link";
-import { signIn } from "next-auth/react";
-import { useSearchParams } from "next/navigation";
 import SocialSignin from "@/components/shared/SocialSignin";
-import { toast } from "react-toastify";
+import { signIn, useSession,} from "next-auth/react";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+
 
 const Page = () => {
+  const router = useRouter();
+  const session = useSession();
   const searchParams = useSearchParams();
   const path = searchParams.get("redirect");
 
@@ -16,26 +17,12 @@ const Page = () => {
     event.preventDefault();
     const email = event.target.email.value;
     const password = event.target.password.value;
-
-    try {
-      const res = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
-        callbackUrl: path ? path : "/",
-      });
-
-      if (res.error) {
-        // Handle error (display message, etc.)
-        toast.error("Login failed: " + res.error);
-      } else {
-        // Redirect to the callback URL
-        window.location.href = res.url || "/";
-      }
-    } catch (error) {
-      console.error("Error during sign in:", error);
-      toast.error("Login failed: " + error.message);
-    }
+    const res = await signIn("credentials", {
+      email,
+      password,
+      redirect: true,
+      callbackUrl: path ? path : "/",
+    });
   };
 
   return (

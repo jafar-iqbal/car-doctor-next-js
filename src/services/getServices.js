@@ -6,6 +6,7 @@ export const getServicesFromDB = async () => {
     return res.data;
   } catch (error) {
     throw new Error('Failed to fetch services');
+    
   }
 };
 

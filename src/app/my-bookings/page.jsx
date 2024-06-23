@@ -16,9 +16,11 @@ const Page = () => {
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_BASE_URL}/my-bookings/api/${session.user.email}`
         );
+        if (!res.ok) throw new Error("Failed to fetch bookings");
         const data = await res.json();
         setBookings(data.myBookings);
       } catch (error) {
+        console.error("Error loading bookings:", error);
         toast.error("Failed to load bookings.");
       } finally {
         setLoading(false);
@@ -28,30 +30,36 @@ const Page = () => {
 
   const handleDelete = async (id) => {
     try {
-      const deleted = await fetch(
+      const res = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/my-bookings/api/booking/${id}`,
         {
           method: "DELETE",
         }
       );
-      const res = await deleted.json();
-      if (res?.res?.deletedCount > 0) {
-        toast.success(res.message);
+      if (!res.ok) throw new Error("Failed to delete booking");
+      const result = await res.json();
+      if (result?.res?.deletedCount > 0) {
+        toast.success(result.message);
         loadData();
       } else {
         toast.error("Failed to delete booking.");
       }
     } catch (error) {
+      console.error("Error deleting booking:", error);
       toast.error("Failed to delete booking.");
     }
   };
 
   useEffect(() => {
     loadData();
-  }, [session, status]);
+  }, []);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div>Loading...</div>
+      </div>
+    );
   }
 
   return (
@@ -60,7 +68,7 @@ const Page = () => {
       <div className="relative h-72">
         <Image
           className="absolute h-72 w-full left-0 top-0 object-cover"
-          src={"/assets/images/about_us/parts.jpg"}
+          src="/assets/images/about_us/parts.jpg"
           alt="service"
           width={1920}
           height={1080}
@@ -85,27 +93,35 @@ const Page = () => {
               </tr>
             </thead>
             <tbody>
-              {bookings?.map(({ serviceTitle, _id, date, price }, index) => (
-                <tr key={_id}>
-                  <th>{index + 1}</th>
-                  <td>{serviceTitle}</td>
-                  <td>{price}</td>
-                  <td>{date}</td>
-                  <td>
-                    <div className="flex items-center space-x-3">
-                      <Link href={`/my-bookings/update/${_id}`}>
-                        <button className="btn btn-primary">Edit</button>
-                      </Link>
-                      <button
-                        onClick={() => handleDelete(_id)}
-                        className="btn btn-error"
-                      >
-                        Delete
-                      </button>
-                    </div>
+              {bookings?.length ? (
+                bookings.map(({ serviceTitle, _id, date, price }, index) => (
+                  <tr key={_id}>
+                    <th>{index + 1}</th>
+                    <td>{serviceTitle}</td>
+                    <td>{price}</td>
+                    <td>{date}</td>
+                    <td>
+                      <div className="flex items-center space-x-3">
+                        <Link href={`/my-bookings/update/${_id}`}>
+                          <button className="btn btn-primary">Edit</button>
+                        </Link>
+                        <button
+                          onClick={() => handleDelete(_id)}
+                          className="btn btn-error"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="5" className="text-center">
+                    No bookings found.
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>

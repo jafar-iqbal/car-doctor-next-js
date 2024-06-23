@@ -2,59 +2,36 @@
 import SocialSignin from "@/components/shared/SocialSignin";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useState } from "react";
+import { useState } from "react";
 
 const SignUpPage = () => {
-  const [selectedImage, setSelectedImage] = useState(null);
   const [error, setError] = useState(null);
 
   const handleSignUp = async (event) => {
     event.preventDefault();
     setError(null);
-
     const newUser = {
       name: event.target.name.value,
       email: event.target.email.value,
       password: event.target.password.value,
-      image: selectedImage,
-    };
 
-    try {
+    };
       const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/signup/api`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify(newUser),
+        headers: {
+          "content-type": "application/json",
+        },
       });
-
       if (res.status === 200) {
         event.target.reset();
-        setSelectedImage(null);
-      } else {
-        const data = await res.json();
-        setError(data.message || 'Something went wrong');
       }
-    } catch (err) {
-      setError('Something went wrong');
     }
-  };
-
-  const handleImageChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setSelectedImage(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
 
   return (
-    <div className="container mx-auto py-24 px-24">
-      <div className="grid grid-cols-2 gap-12 items-center">
-        <div>
+    <div className="container mx-auto py-24 px-4 md:px-24">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+        <div className="hidden md:block">
           <Image
             src="/assets/images/login/login.svg"
             height={540}
@@ -62,13 +39,13 @@ const SignUpPage = () => {
             alt="login image"
           />
         </div>
-        <div className="border-2 border-orange-500 rounded-lg p-12">
-          <h6 className="text-3xl font-semibold text-center mb-12">
+        <div className="border-2 border-orange-500 rounded-lg p-6 md:p-12">
+          <h6 className="text-3xl font-semibold text-center mb-6 md:mb-12">
             Please Sign Up
           </h6>
           <form onSubmit={handleSignUp}>
             <label htmlFor="name">User Name</label>
-            <label className="input input-bordered flex items-center gap-2 mb-6">
+            <div className="input input-bordered flex items-center gap-2 mb-6">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 16 16"
@@ -78,9 +55,9 @@ const SignUpPage = () => {
                 <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM12.735 14c.618 0 1.093-.561.872-1.139a6.002 6.002 0 0 0-11.215 0c-.22.578.254 1.139.872 1.139h9.47Z" />
               </svg>
               <input type="text" className="grow" name="name" placeholder="Username" required />
-            </label>
+            </div>
             <label htmlFor="email">Email</label>
-            <label className="input input-bordered flex items-center gap-2 mb-6">
+            <div className="input input-bordered flex items-center gap-2 mb-6">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 16 16"
@@ -91,9 +68,9 @@ const SignUpPage = () => {
                 <path d="M15 6.954 8.978 9.86a2.25 2.25 0 0 1-1.956 0L1 6.954V11.5A1.5 1.5 0 0 0 2.5 13h11a1.5 1.5 0 0 0 1.5-1.5V6.954Z" />
               </svg>
               <input type="email" name="email" className="grow" placeholder="Email" required />
-            </label>
+            </div>
             <label htmlFor="password">Password</label>
-            <label className="input input-bordered flex items-center gap-2 mb-6">
+            <div className="input input-bordered flex items-center gap-2 mb-6">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 16 16"
@@ -106,23 +83,7 @@ const SignUpPage = () => {
                 />
               </svg>
               <input type="password" name="password" className="grow" placeholder="Enter password" required />
-            </label>
-
-            <label htmlFor="image">Profile Image</label>
-            <input type="file" name="image" accept="image/*" onChange={handleImageChange} className="mb-6" />
-
-            {selectedImage && (
-              <div className="mb-6">
-                <Image
-                  src={selectedImage}
-                  alt="Selected Profile Image"
-                  width={100}
-                  height={100}
-                  className="rounded-full"
-                />
-              </div>
-            )}
-
+            </div>
             {error && (
               <div className="mb-6 text-red-500">
                 {error}

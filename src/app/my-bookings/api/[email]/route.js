@@ -1,12 +1,22 @@
 import { connectDB } from "@/lib/connect.DB";
 
 export const GET = async (req, { params }) => {
-  const db = await connectDB();
-  const bookingsCollection = db.collection("bookings");
   try {
+    const db = await connectDB();
+    const bookingsCollection = db.collection("bookings");
+
     const myBookings = await bookingsCollection.find({ email: params.email }).toArray();
-    return Response.json({ myBookings });
+
+    return new Response(JSON.stringify({ myBookings }), {
+      status: 200,
+      headers: { "content-type": "application/json" },
+    });
   } catch (error) {
-    console.log(error.message);
+    console.error("Error fetching bookings:", error.message);
+
+    return new Response(JSON.stringify({ message: "Something went wrong" }), {
+      status: 500,
+      headers: { "content-type": "application/json" },
+    });
   }
 };

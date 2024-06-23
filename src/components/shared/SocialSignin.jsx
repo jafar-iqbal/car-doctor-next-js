@@ -1,6 +1,6 @@
 "use client";
 import { signIn, useSession } from "next-auth/react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import React from 'react';
 import { BiLogoFacebookCircle } from "react-icons/bi";
 import { FcGoogle } from "react-icons/fc";

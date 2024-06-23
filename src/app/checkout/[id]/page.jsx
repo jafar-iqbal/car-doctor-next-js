@@ -4,14 +4,17 @@ import { useSession } from "next-auth/react";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 const Checkout = ({ params }) => {
   const { data } = useSession();
   const [service, setService] = useState({});
+
   const loadService = async () => {
     const details = await getServicesDetailsFromDB(params.id);
     setService(details.service);
   };
+
   const { _id, title, img, price } = service || {};
 
   const handleBooking = async (event) => {
@@ -34,6 +37,7 @@ const Checkout = ({ params }) => {
         "content-type": "application/json"
       }
     });
+
     const response = await resp?.json();
     toast.success(response?.message);
     event.target.reset();
@@ -41,7 +45,7 @@ const Checkout = ({ params }) => {
 
   useEffect(() => {
     loadService();
-  }, [params]);
+  }, [params,loadService]);
 
   const formatDate = (date) => {
     const d = new Date(date);

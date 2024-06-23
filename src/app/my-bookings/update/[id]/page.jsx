@@ -57,7 +57,7 @@ const Page = ({ params }) => {
     if (params?.id) {
       loadBooking();
     }
-  }, [params]);
+  }, []);
 
   return (
     <div className="container mx-auto">
