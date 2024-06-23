@@ -4,27 +4,37 @@ import Image from "next/image";
 import React from "react";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import SocialSignin from "@/components/shared/SocialSignin";
+import { toast } from "react-toastify";
 
 const Page = () => {
-  const router = useRouter();
+  const searchParams = useSearchParams();
+  const path = searchParams.get("redirect");
 
   const handleLogin = async (event) => {
     event.preventDefault();
     const email = event.target.email.value;
     const password = event.target.password.value;
 
-    const res = await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
-    });
+    try {
+      const res = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+        callbackUrl: path ? path : "/",
+      });
 
-    if (res?.ok) {
-      router.push('/');
-    } else {
-      console.error("Login failed", res);
+      if (res.error) {
+        // Handle error (display message, etc.)
+        toast.error("Login failed: " + res.error);
+      } else {
+        // Redirect to the callback URL
+        window.location.href = res.url || "/";
+      }
+    } catch (error) {
+      console.error("Error during sign in:", error);
+      toast.error("Login failed: " + error.message);
     }
   };
 
@@ -96,7 +106,7 @@ const Page = () => {
           <div className="mt-12">
             <h6 className="divider text-cyan-700">or sign in with</h6>
             <div className="text-center space-x-3">
-              <SocialSignin/>
+              <SocialSignin />
               <h6 className="text-cyan-700 mt-12">
                 Do not have an account?{" "}
                 <Link href="/signup" className="text-primary font-semibold">
