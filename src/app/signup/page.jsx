@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import SocialSignin from "@/components/shared/SocialSignin";
 import Image from "next/image";
